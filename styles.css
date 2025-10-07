@@ -10,10 +10,24 @@ body {
             margin-bottom: 20px; /* Add space below the title */
         }
 
+        #container {
+            display: flex;
+            flex-direction: column; 
+            align-items: center; 
+            gap: 40px; 
+        }
+
         #symbol_map {
             display: flex;
             justify-content: center; 
-            margin: 0 auto; 
+
+
+        }
+
+        #bar_chart {
+            display: flex;
+            justify-content: center; 
+
         }
 
 		

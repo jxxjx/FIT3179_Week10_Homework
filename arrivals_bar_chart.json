@@ -1,8 +1,9 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": "Top 10 Point of Entry by Year",
-  "width": 600,
-  "height": {"step": 28},
+  "width": 1000,
+  "height": 500,
+  "view": {"fill": "#transparent", "stroke": "transparent"},
   "data": {
     "url": "https://raw.githubusercontent.com/jxxjx/FIT3179_Week9_Homework/main/foreign_arrivals.csv",
     "format": {"type": "csv"}
@@ -46,19 +47,20 @@
     "x": {
       "field": "TotalArrivals",
       "type": "quantitative",
-      "axis": {"format": "~s", "title": null}
+      "axis": {"format": "~s", "title": null, "grid": false}
     },
     "color": {
       "field": "type",
       "type": "nominal",
       "title": "Mode",
-      "scale": {"domain": ["Sea", "Air", "Land"], "range": ["#56b3e9", "#2675bd", "#0a3172"]}
+      "scale": {"domain": ["Air", "Sea", "Land"], "range": ["#8CCDEB", "#131D4F", "#541212"]},
+      "legend": null
     },
+    
     "tooltip": [
       {"field": "poe", "title": "Point of Entry"},
       {"field": "type", "title": "Mode"},
-      {"field": "TotalArrivals", "type": "quantitative", "title": "Arrivals", "format": ","},
-      {"field": "yr", "title": "Year"}
+      {"field": "TotalArrivals", "type": "quantitative", "title": "Arrivals", "format": ","}
     ]
   }
 }
