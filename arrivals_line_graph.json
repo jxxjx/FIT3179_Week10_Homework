@@ -1,77 +1,110 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": {"text": "Tourism and GDP Quarterly Year on Year (YoY) Growth (%)", "fontSize": 20},
-  "width": 820,
-  "height": 360,
-  "config": {
-    "view": {"stroke": null},
-    "axis": {"labelFontSize": 12, "titleFontSize": 12, "grid": true, "gridOpacity": 0.15}
-  },
-
-  "data": {
-    "url": "https://raw.githubusercontent.com/jxxjx/FIT3179_Week9_Homework/main/gdp_qtr_real_supply_sub.csv",
-    "format": {"type": "csv", "parse": {"date": "date"}}
-  },
-
-  "transform": [
-    {"fold": ["gdp_yoy", "tourism_yoy"], "as": ["series", "value"]},
+  "hconcat": [
     {
-      "calculate": "datum.series == 'gdp_yoy' ? 'GDP' : 'Tourism Arrival'",
-      "as": "Series Label"
+      "width": 650,
+      "height": 360,
+      "title": {"text": "Tourism and GDP Quarterly Year on Year (YoY) Growth (%)", "fontSize": 18},
+      "data": {
+        "url": "https://raw.githubusercontent.com/jxxjx/FIT3179_Week10_Homework/main/gdp_qtr_real_supply_sub.csv",
+        "format": {"type": "csv", "parse": {"date": "date"}}
+      },
+      "transform": [
+        {"fold": ["gdp_yoy", "tourism_yoy"], "as": ["series", "value"]},
+        {
+          "calculate": "datum.series == 'gdp_yoy' ? 'GDP' : 'Tourism Arrival'",
+          "as": "Series"
+        }
+      ],
+      "layer": [
+        {"mark": {"type": "rule", "strokeDash": [4,4], "opacity": 0.4}, "encoding": {"y": {"datum": 0}}},
+        {
+          "mark": {"type": "line", "point": true, "strokeWidth": 3},
+          "encoding": {
+            "x": {
+              "field": "date",
+              "type": "temporal",
+              "axis": {"title": null, "labelFontSize": 12, "tickCount": "year"}
+            },
+            "y": {
+              "field": "value",
+              "type": "quantitative",
+              "axis": {"title": "Growth (%)", "labelFontSize": 12, "titleFontSize": 12}
+            },
+            "color": {
+              "field": "Series",
+              "type": "nominal",
+              "scale": {
+                "domain": ["GDP", "Tourism Arrival"],
+                "range": ["#E31A59", "#1F5AA6"]
+              },
+              "legend": {"orient": "none"}
+            },
+            "tooltip": [
+              {"field": "Series"},
+              {"field": "date", "type": "temporal", "timeUnit": "yearquarter", "title": "Quarter"},
+              {"field": "value", "type": "quantitative", "title": "YoY (%)", "format": ".1f"}
+            ]
+          }
+        },
+        {
+          "transform": [
+            {"window": [{"op": "rank", "as": "rank"}], "groupby": ["Series"], "sort": [{"field": "date"}]},
+            {"filter": "datum.rank == max(datum.rank)"}
+          ],
+          "mark": {"type": "text", "dx": 8, "dy": -6, "fontSize": 12},
+          "encoding": {
+            "x": {"field": "date", "type": "temporal"},
+            "y": {"field": "value", "type": "quantitative"},
+            "text": {"field": "Series"},
+            "color": {
+              "field": "Series",
+              "type": "nominal",
+              "scale": {
+                "domain": ["GDP", "Tourism Arrival"],
+                "range": ["#E31A59", "#1F5AA6"]
+              },
+              "legend": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "title": null,
+      "width": 260,
+      "mark": {"type": "text", "align": "left", "fontSize": 14, "fontWeight": "normal"},
+      "encoding": {
+        "text": {
+          "value": "Tourism’s impact towards GDP\n\n"
+        }
+      },
+      "layer": [
+        {
+          "mark": {"type": "text", "align": "left", "fontSize": 16, "fontWeight": "bold", "dx": 0, "dy": 0},
+          "encoding": {"text": {"value": "Tourism’s impact towards GDP"}}
+        },
+        {
+          "mark": {"type": "text", "align": "left", "fontSize": 13, "dy": 25},
+          "encoding": {
+            "text": {
+              "value": "Tourism dropped dramatically in 2021 during COVID-19 but recovered swiftly once borders reopened in 2022 Q3."
+            },
+            "color": {"value": "#1F5AA6"}
+          }
+        },
+        {
+          "mark": {"type": "text", "align": "left", "fontSize": 13, "dy": 85},
+          "encoding": {
+            "text": {
+              "value": "GDP remained more stable, but its growth still mirrored tourism’s trends."
+            },
+            "color": {"value": "#E31A59"}
+          }
+        }
+      ]
     }
   ],
 
-  "layer": [
-    {
-      "mark": {"type": "rule", "strokeDash": [4,4], "opacity": 0.5},
-      "encoding": {"y": {"datum": 0}}
-    },
-    {
-      "mark": {"type": "line", "point": true, "strokeWidth": 3},
-      "encoding": {
-        "x": {
-          "field": "date",
-          "type": "temporal",
-          "axis": {"title": null}
-        },
-        "y": {
-          "field": "value",
-          "type": "quantitative",
-          "axis": {"title": "Growth (%)"}
-        },
-        "color": {
-          "field": "Series Label",
-          "type": "nominal",
-          "scale": {
-            "domain": ["GDP", "Tourism Arrival"],
-            "range": ["#E31A59", "#1F5AA6"]
-          },
-          "legend": {"orient": "right", "title": null}
-        },
-        "tooltip": [
-          {"field": "Series Label", "type": "nominal"},
-          {"field": "date", "type": "temporal", "timeUnit": "yearquarter", "title": "Quarter"},
-          {"field": "value", "type": "quantitative", "title": "YoY (%)", "format": ".1f"}
-        ]
-      }
-    },
-    {
-      "transform": [
-        {"window": [{"op": "rank", "as": "r"}], "groupby": ["Series Label"], "sort": [{"field": "date", "order": "ascending"}]},
-        {"filter": "datum.r == max(datum.r)"}
-      ],
-      "mark": {"type": "text", "dx": 8, "dy": -6, "fontSize": 12},
-      "encoding": {
-        "x": {"field": "date", "type": "temporal"},
-        "y": {"field": "value", "type": "quantitative"},
-        "text": {"field": "Series Label"},
-        "color": {
-          "field": "Series Label",
-          "type": "nominal",
-          "scale": {"domain": ["GDP", "Tourism Arrival"], "range": ["#E31A59", "#1F5AA6"]},
-          "legend": null
-        }
-      }
-    }
-  ]
+  "config": {"view": {"stroke": null}}
 }

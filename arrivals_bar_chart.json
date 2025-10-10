@@ -3,11 +3,14 @@
   "title": "Top 10 Point of Entry by Year",
   "width": 1000,
   "height": 500,
-  "view": {"fill": "#transparent", "stroke": "transparent"},
+  "background": null,
+  "view": {"fill": null, "stroke": "transparent"},
+
   "data": {
     "url": "https://raw.githubusercontent.com/jxxjx/FIT3179_Week9_Homework/main/foreign_arrivals.csv",
     "format": {"type": "csv"}
   },
+
   "params": [
     {
       "name": "Year",
@@ -15,13 +18,11 @@
       "bind": {"input": "range", "min": 2020, "max": 2023, "step": 1}
     }
   ],
+
   "transform": [
     {"calculate": "year(datum.date)", "as": "yr"},
     {"filter": "datum.yr == Year"},
-    {
-      "aggregate": [{"op": "sum", "field": "arrivals", "as": "TotalArrivals"}],
-      "groupby": ["poe"]
-    },
+    {"aggregate": [{"op": "sum", "field": "arrivals", "as": "TotalArrivals"}], "groupby": ["poe"]},
     {
       "lookup": "poe",
       "from": {
@@ -36,31 +37,100 @@
     {"window": [{"op": "rank", "as": "rank"}], "sort": [{"field": "TotalArrivals", "order": "descending"}]},
     {"filter": "datum.rank <= 10"}
   ],
-  "mark": {"type": "bar", "cornerRadiusEnd": 4},
-  "encoding": {
-    "y": {
-      "field": "poe",
-      "type": "nominal",
-      "sort": "-x",
-      "title": null
+
+  "layer": [
+
+    {
+      "mark": {"type": "bar", "cornerRadiusEnd": 4},
+      "encoding": {
+        "y": {"field": "poe", "type": "nominal", "sort": "-x", "title": null},
+        "x": {
+          "field": "TotalArrivals",
+          "type": "quantitative",
+          "axis": {"format": "~s", "title": null, "grid": false}
+        },
+        "color": {
+          "field": "type",
+          "type": "nominal",
+          "title": "Mode",
+          "scale": {"domain": ["Air", "Sea", "Land"], "range": ["#8CCDEB", "#131D4F", "#541212"]},
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "poe", "title": "Point of Entry"},
+          {"field": "type", "title": "Mode"},
+          {"field": "TotalArrivals", "type": "quantitative", "title": "Arrivals", "format": ","}
+        ]
+      }
     },
-    "x": {
-      "field": "TotalArrivals",
-      "type": "quantitative",
-      "axis": {"format": "~s", "title": null, "grid": false}
+
+{
+  "transform": [
+    {"filter": "datum.rank == 1"},
+    {"calculate": "'Top POE (' + Year + ')'", "as": "titleLine"},
+    {"calculate": "datum.poe", "as": "nameLine"},
+    {"calculate": "format(datum.TotalArrivals, ',') + ' arrivals • ' + datum.type", "as": "metaLine"},
+    {
+      "calculate": "datum.poe == 'Bangunan Sultan Iskandar' ? 'It is the busiest land crossing linking Malaysia and Singapore.' : 'It is main land connection between Malaysia and Thailand.'",
+      "as": "descLine"
+    }
+  ],
+  "layer": [
+    {
+      "mark": {
+        "type": "rect",
+        "cornerRadius": 10,
+        "color": "white",
+        "opacity": 0.95,
+        "stroke": "#ddd"
+      },
+      "encoding": {
+        "x": {"value": 600},
+        "y": {"value": 50},
+        "x2": {"value": 980},
+        "y2": {"value": 150}
+      }
     },
-    "color": {
-      "field": "type",
-      "type": "nominal",
-      "title": "Mode",
-      "scale": {"domain": ["Air", "Sea", "Land"], "range": ["#8CCDEB", "#131D4F", "#541212"]},
-      "legend": null
+    {
+      "mark": {"type": "text", "align": "left", "fontWeight": "bold", "fontSize": 12},
+      "encoding": {
+        "x": {"value": 615},
+        "y": {"value": 70},
+        "text": {"field": "titleLine"},
+        "color": {"value": "#111"}
+      }
     },
-    
-    "tooltip": [
-      {"field": "poe", "title": "Point of Entry"},
-      {"field": "type", "title": "Mode"},
-      {"field": "TotalArrivals", "type": "quantitative", "title": "Arrivals", "format": ","}
-    ]
-  }
+    {
+      "mark": {"type": "text", "align": "left", "fontSize": 14, "fontWeight": "bold"},
+      "encoding": {
+        "x": {"value": 615},
+        "y": {"value": 92},
+        "text": {"field": "nameLine"},
+        "color": {"value": "#131D4F"}
+      }
+    },
+    {
+      "mark": {"type": "text", "align": "left", "fontSize": 12},
+      "encoding": {
+        "x": {"value": 615},
+        "y": {"value": 110},
+        "text": {"field": "metaLine"},
+        "color": {"value": "#444"}
+      }
+    },
+    {
+      "mark": {"type": "text", "align": "left", "fontSize": 12},
+      "encoding": {
+        "x": {"value": 615},
+        "y": {"value": 130},
+        "text": {"field": "descLine"},
+        "color": {"value": "#444"}
+      }
+    }
+  ]
+}
+
+
+
+  ]
 }
