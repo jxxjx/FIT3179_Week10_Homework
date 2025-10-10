@@ -39,6 +39,23 @@
   ],
 
   "layer": [
+    {
+    "data": {
+      "url": "https://raw.githubusercontent.com/jxxjx/FIT3179_Week9_Homework/main/foreign_arrivals.csv",
+      "format": {"type": "csv"}
+    },
+    "transform": [
+      {"calculate": "year(datum.date)", "as": "yr"},
+      {"aggregate": [{"op": "sum", "field": "arrivals", "as": "SumArr"}], "groupby": ["poe", "yr"]},
+      {"aggregate": [{"op": "max", "field": "SumArr", "as": "GlobalMax"}]}
+     
+    ],
+    "mark": {"type": "point", "opacity": 0},
+    "encoding": {
+      "x": {"field": "GlobalMax", "type": "quantitative"}
+      
+    }
+  },
 
     {
       "mark": {"type": "bar", "cornerRadiusEnd": 4},

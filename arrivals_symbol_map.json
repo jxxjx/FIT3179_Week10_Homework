@@ -6,8 +6,11 @@
   "background": "#bce9fe",
   "view": {"fill": "#transparent", "stroke": "transparent"},
   "params": [
-    { "name": "Sex", "value": "Total",
-      "bind": { "input": "select", "options": ["Total","Male","Female"] } }
+    {
+      "name": "Sex",
+      "value": "Total",
+      "bind": {"input": "select", "options": ["Total", "Male", "Female"]}
+    }
   ],
   "layer": [
     {
@@ -30,6 +33,33 @@
         "format": {"type": "topojson", "feature": "my"}
       },
       "mark": {"type": "geoshape", "fill": "#f8f5dd", "stroke": "#8b7d6f", "strokeWidth": 1}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/jxxjx/FIT3179_Week9_Homework/main/foreign_arrivals.csv",
+        "format": {"type": "csv", "parse": {"date": "date"}}
+      },
+      "transform": [
+        {"calculate": "year(datum.date)", "as": "yr"},
+        {"filter": "datum.yr == 2023"},
+        {
+          "aggregate": [
+            {"op": "sum", "field": "arrivals", "as": "arrivals_total"},
+            {"op": "sum", "field": "arrivals_male", "as": "arrivals_male"},
+            {"op": "sum", "field": "arrivals_female", "as": "arrivals_female"}
+          ],
+          "groupby": ["poe"]
+        },
+        {"fold": ["arrivals_total", "arrivals_male", "arrivals_female"], "as": ["series", "val"]}
+      ],
+      "mark": {"type": "point", "opacity": 0},
+      "encoding": {
+        "size": {
+          "field": "val",
+          "type": "quantitative",
+          "scale": {"type": "sqrt", "range": [30, 1200]}
+        }
+      }
     },
     {
       "data": {
